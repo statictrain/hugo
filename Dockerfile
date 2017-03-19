@@ -35,3 +35,5 @@ RUN apk add \
   rm /var/cache/apk/*
 
 VOLUME /build
+WORKDIR /build
+
