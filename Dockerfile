@@ -1,12 +1,37 @@
-FROM minhajuddin/golang-1.5.2:1.0.2
-MAINTAINER minhajuddink@gmail.com
+FROM alpine:latest
+MAINTAINER Static Train <statictrain@cosmicvent.com>
 
-ENV HUGO_VERSION=0.16
+# this is for when we need to force a refresh
+ENV REFRESHED_AT 2017-03-19
+ENV IMAGE statictrain/hugo
+ENV HUGO_VERSION 0.19
+ENV HUGO_URL https://github.com/spf13/hugo/releases/download/v0.19/hugo_0.19_Linux-64bit.tar.gz
 
-RUN wget https://github.com/spf13/hugo/releases/download/v${HUGO_VERSION}/hugo_${HUGO_VERSION}_linux-64bit.tgz && \
-  tar xvzf hugo_${HUGO_VERSION}_linux-64bit.tgz  && \
-  rm -r hugo_${HUGO_VERSION}_linux-64bit.tgz  && \
-  mv hugo /usr/bin/hugo
+RUN apk add \
+  --update \
+  --no-progress \
+  --no-cache \
+  py-pip \
+  wget \
+  ca-certificates \
+  git \
+  && \
+  wget "$HUGO_URL" \
+  && \
+  mkdir -p /usr/local/hugo \
+  && \
+  tar xzf "$(basename "$HUGO_URL")" -C /usr/local/hugo \
+  && \
+  rm "$(basename "$HUGO_URL")" \
+  && \
+  ln -s /usr/local/hugo/*/hugo* /usr/local/bin/hugo \
+  && \
+  apk del wget \
+  && \
+  pip install --upgrade pip \
+  && \
+  pip install pygments \
+  && \
+  rm /var/cache/apk/*
 
-WORKDIR /opt/build
-
+VOLUME /build
